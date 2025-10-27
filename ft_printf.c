@@ -99,6 +99,8 @@ static int	char_counter(int n)
 	int	counter;
 
 	counter = 0;
+	if (n == 0)
+		return (1);
 	while (n != 0)
 	{
 		n = n / 10;
@@ -151,6 +153,8 @@ static int	fn_print_format(char format, va_list args)
 		char_counter += unsigned_to_hex(va_arg(args, unsigned), 'x');
 	if (format == 'X')
 		char_counter += unsigned_to_hex(va_arg(args, unsigned), 'X');
+	if (format == '%')
+		char_counter += write(1, "%", 1);
 	return (char_counter);
 }
 
@@ -171,8 +175,6 @@ int	ft_printf(const char *format, ...)
 			skip_specifier = 1;
 			char_counter += fn_print_format(format[1], args);
 			format++;
-			if (*format == '%')
-				char_counter += write(1, format, 1);
 		}
 		if (skip_specifier != 1)
 			char_counter += write(1, format, 1);
@@ -184,5 +186,5 @@ int	ft_printf(const char *format, ...)
 int main(void)
 {
     int x = 42;
-	printf("%i", ft_printf("%x\n", 123456));
+	printf("%i", ft_printf("%%\n"));
 }
