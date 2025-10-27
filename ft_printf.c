@@ -5,8 +5,20 @@
 #include <stdint.h>
 #include "libft.h"
 
-static int	print_address(void *ptr);
 static int	print_recursively(uintptr_t addr);
+
+ssize_t	custom_write(char *str)
+{
+	size_t	len;
+	ssize_t	written_bytes;
+
+	len = ft_strlen(str);
+	return_value = write(1, str, len);
+	return (return_value);
+}
+	
+
+
 
 static int	print_hex_address(void *address)
 {
