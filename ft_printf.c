@@ -7,14 +7,12 @@
 
 static int	print_recursively(uintptr_t addr);
 
-ssize_t	custom_write(char *str)
+int	fail_check(int *total, int current_return)
 {
-	size_t	len;
-	ssize_t	written_bytes;
-
-	len = ft_strlen(str);
-	return_value = write(1, str, len);
-	return (return_value);
+	if (current_return == -1)
+		return (-1);
+	*total = *total + current_return;
+	return (0);
 }
 	
 
@@ -27,12 +25,15 @@ static int	print_hex_address(void *address)
 	
 	addr = (uintptr_t)address;
 	counter = print_recursively(addr);
+	if (counter == -1)
+		return (-1);
 	return (counter);
 }
 
 static int	print_recursively(uintptr_t addr)
 {
 	int			counter;
+	int		current_return;
 	const char	*hex_digits;
 
 	counter = 0;	
@@ -40,19 +41,27 @@ static int	print_recursively(uintptr_t addr)
 
 	if (addr < 16)
 	{
-		counter += write(1, "0x", 2);
-		counter += write(1, &hex_digits[addr], 1);
+		current_return = write(1, "0x", 2);
+		if (fail_check(&counter, current_return) == -1)
+			return (-1);
+		current_return = write(1, &hex_digits[addr], 1);
+		if (fail_check(&counter, current_return) == -1)
+			return (-1);
 		return (counter);
 	}
-	counter += print_recursively((addr / 16));
-	write(1, &hex_digits[addr % 16], 1);
-	counter++;
+	current_return = print_recursively((addr / 16));
+	if (fail_check(&counter, current_return) == -1)
+		return (-1);
+	current_return = write(1, &hex_digits[addr % 16], 1);
+	if (fail_check(&counter, current_return) == -1)
+			return (-1);
 	return (counter);
 }
 
 static int	unsigned_to_hex(unsigned int num, char x)
 {
 	int			counter;
+	int		current_return;
 	const char	*hex_digits;
 
 	counter = 0;
@@ -62,12 +71,17 @@ static int	unsigned_to_hex(unsigned int num, char x)
 		hex_digits = "0123456789ABCDEF";
 	if (num < 16)
 	{
-		counter += write(1, &hex_digits[num], 1);
+		current_return = write(1, &hex_digits[num], 1);
+		if (fail_check(&counter, current_return) == -1)
+			return (-1);
 		return (counter);
 	}
-	counter += unsigned_to_hex((num / 16), x);
-	write(1, &hex_digits[num % 16], 1);
-	counter++;
+	current_return = unsigned_to_hex((num / 16), x);
+	if (fail_check(&counter, current_return) == -1)
+		return (-1);
+	current_return = write(1, &hex_digits[num % 16], 1);
+	if (fail_check(&counter, current_return) == -1)
+		return (-1);
 	return (counter);
 }
 
@@ -75,35 +89,44 @@ static int	print_unsigned(unsigned int num)
 {
 	char	nbr;
 	int		counter;
+	int		current_return;
 	
 	counter = 0;
 	if (num <= 9)
 	{
 		nbr = num + '0';
-		counter += write(1, &nbr, 1);
+		current_return = write(1, &nbr, 1);
+		if (fail_check(&counter, current_return) == -1)
+			return (-1);
 		return (counter);
 	}
-	counter += print_unsigned(num / 10);
+	current_return = print_unsigned(num / 10);
+	if (fail_check(&counter, current_return) == -1)
+		return (-1);
 	nbr = (num % 10) + '0';
-	counter += write(1, &nbr, 1);
+	current_return = write(1, &nbr, 1);
+	if (fail_check(&counter, current_return) == -1)
+		return (-1);
 	return (counter);
 }
 
 static int	fn_putchar(char c)
 {
-	write(1, &c, 1);
+	if (write(1, &c, 1) == -1)
+		return (-1);
 	return (1);
 }
 
 static int	putstr(char *s)
 {
-	int	len;
+	int	counter;
 
 	if (!s)
 		return (0);
-	len = ft_strlen(s);
-	write(1, s, len);
-	return (len);
+	counter = ft_strlen(s);
+	if (write(1, s, counter) == -1)
+		return (-1);
+	return (counter);
 }
 
 static int	char_counter(int n)
@@ -137,66 +160,75 @@ static int	putnbr(int n)
 	if (l_int <= 9)
 	{
 		nbr = l_int + '0';
-		write(1, &nbr, 1);
+		counter += write(1, &nbr, 1);
 		return (counter);
 	}
 	putnbr(l_int / 10);
 	nbr = (l_int % 10) + '0';
-	write(1, &nbr, 1);
+	counter += write(1, &nbr, 1);
 	return (counter);
 }
 
 static int	fn_print_format(char format, va_list args)
 {
 	int	char_counter;
+	int	current_return;
 
 	char_counter = 0;
 	if (format == 'c')
-		char_counter += fn_putchar(va_arg(args, int));
-	if (format == 's')
-		char_counter += putstr(va_arg(args, char *));
-	if (format == 'p')
-		char_counter += print_hex_address(va_arg(args, void *));
-	if (format == 'd' || format == 'i')
-		char_counter += putnbr(va_arg(args, int));
-	if (format == 'u')
-		char_counter += print_unsigned(va_arg(args, unsigned));
-	if (format == 'x')
-		char_counter += unsigned_to_hex(va_arg(args, unsigned), 'x');
-	if (format == 'X')
-		char_counter += unsigned_to_hex(va_arg(args, unsigned), 'X');
-	if (format == '%')
-		char_counter += write(1, "%", 1);
+		current_return = fn_putchar(va_arg(args, int));
+	else if (format == 's')
+		current_return = putstr(va_arg(args, char *));
+	else if (format == 'p')
+		current_return = print_hex_address(va_arg(args, void *));
+	else if (format == 'd' || format == 'i')
+		current_return = putnbr(va_arg(args, int));
+	else if (format == 'u')
+		current_return = print_unsigned(va_arg(args, unsigned));
+	else if (format == 'x')
+		current_return = unsigned_to_hex(va_arg(args, unsigned), 'x');
+	else if (format == 'X')
+		current_return = unsigned_to_hex(va_arg(args, unsigned), 'X');
+	else if (format == '%')
+		current_return = write(1, "%", 1);
+	if (fail_check(&char_counter, current_return) == -1)
+		return (-1);
 	return (char_counter);
 }
 
 int	ft_printf(const char *format, ...)
 {
-	va_list	args;
-	char	*c;
-	int		skip_specifier;
 	int		char_counter;
+	int		current_return;
 	
+	va_list	args;
 	va_start(args, format);
 	char_counter = 0;
 	while (*format != '\0')
 	{
-		skip_specifier = 0;
 		if (*format == '%')
 		{
-			skip_specifier = 1;
-			char_counter += fn_print_format(format[1], args);
+			current_return = fn_print_format(format[1], args);
+			if (fail_check(&char_counter, current_return) == -1)
+				return (va_end(args), -1);
 			format++;
 		}
-		if (skip_specifier != 1)
-			char_counter += write(1, format, 1);
+		else
+		{
+			current_return = write(1, format, 1);
+			if (fail_check(&char_counter, current_return) == -1)
+				return (va_end(args), -1);
+		}
 		format++;
 	}
+	va_end(args);
 	return (char_counter);
 }
 
 int main(void)
 {
-    int x = 42;
-	printf("%i", ft_printf("%%\n"));
+	char *c = "FELIX";
+   //unsigned int x = 665462;
+    //int *p = &x;
+	printf("%i", ft_printf("%%", c));
 }
