@@ -10,10 +10,8 @@ all: $(NAME)
 $(NAME): $(OBJ_FILES)
 	ar -rc $(NAME) $(OBJ_FILES)
 
-%.o: %.c
+%.o: %.c $(HEADER)
 	$(CC) -c $(OPTIONS) $< -o $@
-
-OBJ_FILES: $(HEADER)
 
 clean:
 	rm -f $(OBJ_FILES)
