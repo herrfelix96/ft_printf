@@ -1,25 +1,30 @@
 CC=cc
-OPTIONS=-Wall -Wextra -Werror
+CFLAGS=-Wall -Wextra -Werror -I.
 NAME=libftprintf.a
-SRC_FILES=ft_printf.c helpers.c
-OBJ_FILES=$(SRC_FILES:.c=.o)
+
+SRC=ft_printf.c \
+          helpers/ft_printf_formats.c \
+          helpers/ft_printf_hex.c \
+          helpers/ft_printf_numbers.c \
+          helpers/ft_printf_utils.c
+
+OBJ=$(SRC:.c=.o)
 HEADER=ft_printf.h
 
 all: $(NAME)
 
-$(NAME): $(OBJ_FILES)
-	ar -rc $(NAME) $(OBJ_FILES)
+$(NAME): $(OBJ)
+	ar rcs $(NAME) $(OBJ)
 
 %.o: %.c $(HEADER)
-	$(CC) -c $(OPTIONS) $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(OBJ_FILES)
+	rm -f $(OBJ)
 
 fclean: clean
 	rm -f $(NAME)
 
-re: fclean
-	$(MAKE) all
+re: fclean all
 
-.PHONY: clean fclean re all
+.PHONY: all clean fclean re

@@ -1,4 +1,30 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_printf_hex.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: fharutyu <fharutyu@student.42vienna.c      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/02 13:04:54 by fharutyu          #+#    #+#             */
+/*   Updated: 2026/02/02 13:04:56 by fharutyu         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "ft_printf.h"
+
+int	print_hex_address(void *address)
+{
+	uintptr_t	addr;
+	int			counter;
+
+	if (!address)
+		return (write(1, "(nil)", 5));
+	addr = (uintptr_t)address;
+	counter = print_recursively(addr);
+	if (counter == -1)
+		return (-1);
+	return (counter);
+}
 
 int	print_recursively(uintptr_t addr)
 {
@@ -23,20 +49,6 @@ int	print_recursively(uintptr_t addr)
 		return (-1);
 	current_return = write(1, &hex_digits[addr % 16], 1);
 	if (fail_check(&counter, current_return) == -1)
-		return (-1);
-	return (counter);
-}
-
-int	print_hex_address(void *address)
-{
-	uintptr_t	addr;
-	int			counter;
-
-	if (!address)
-		return (write(1, "(nil)", 5));
-	addr = (uintptr_t)address;
-	counter = print_recursively(addr);
-	if (counter == -1)
 		return (-1);
 	return (counter);
 }
@@ -66,36 +78,4 @@ int	unsigned_to_hex(unsigned int num, char x)
 	if (fail_check(&counter, current_return) == -1)
 		return (-1);
 	return (counter);
-}
-
-int	print_unsigned(unsigned int num)
-{
-	char	nbr;
-	int		counter;
-	int		current_return;
-
-	counter = 0;
-	if (num <= 9)
-	{
-		nbr = num + '0';
-		current_return = write(1, &nbr, 1);
-		if (fail_check(&counter, current_return) == -1)
-			return (-1);
-		return (counter);
-	}
-	current_return = print_unsigned(num / 10);
-	if (fail_check(&counter, current_return) == -1)
-		return (-1);
-	nbr = (num % 10) + '0';
-	current_return = write(1, &nbr, 1);
-	if (fail_check(&counter, current_return) == -1)
-		return (-1);
-	return (counter);
-}
-
-int	fn_putchar(char c)
-{
-	if (write(1, &c, 1) == -1)
-		return (-1);
-	return (1);
 }
