@@ -35,7 +35,7 @@ int	fn_print_format(char format, va_list args)
 		current_return = unsigned_to_hex(va_arg(args, unsigned int), 'X');
 	else if (format == '%')
 		current_return = write(1, "%", 1);
-	if (fail_check(&counter, current_return) == -1)
+	if (fail_check(&counter, current_return) == -1) //Checks if any of the previous calls returned -1
 		return (-1);
 	return (counter);
 }
