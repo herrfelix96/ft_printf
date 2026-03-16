@@ -28,11 +28,11 @@ int	print_unsigned(unsigned int num)
 		return (counter);
 	}
 	current_return = print_unsigned(num / 10);
-	if (fail_check(&counter, current_return) == -1)
+	if (fail_check(&counter, current_return) == -1) // Checks if the recusive call returned -1
 		return (-1);
 	nbr = (num % 10) + '0';
 	current_return = write(1, &nbr, 1);
-	if (fail_check(&counter, current_return) == -1)
+	if (fail_check(&counter, current_return) == -1) //Checks if the write() call during the recursive call returned -1
 		return (-1);
 	return (counter);
 }
