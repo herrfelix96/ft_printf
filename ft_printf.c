@@ -26,7 +26,7 @@ int	ft_printf(const char *format, ...)
 		{
 			format++;
 			if (*format == '\0')
-				return (va_end(args), -1);
+				return (va_end(args), -1); //Close the va_list first
 			current_return = fn_print_format(*format, args);
 			if (fail_check(&counter, current_return) == -1)
 				return (va_end(args), -1);
