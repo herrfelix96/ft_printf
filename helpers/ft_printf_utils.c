@@ -37,7 +37,7 @@ size_t	fn_strlen(const char *s)
 	return (i);
 }
 
-int	fn_putstr(char *s)
+int	fn_putstr(char *s) //Bad design, i guess.. Const char would've been better
 {
 	int	counter;
 
